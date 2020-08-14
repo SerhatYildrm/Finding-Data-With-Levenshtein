@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Yakın Veriyi Bulma</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+        <style>
+            .color {
+                background: rgb(63,94,251);
+                background: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(252,70,107,1) 100%);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="jumbotron color text-center">
+            <div style="width: 60%; margin:0 auto;">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <select class="form-control" id="select">
+                            <option>Email</option>
+                            <option>Firma İsmi</option>
+                            <option>Telefon</option>
+                        </select>
+                    </div>
+        
+                    <input type="text" class="form-control" id="data"  placeholder="" aria-label="" aria-describedby="basic-addon1">
+                    <button class="btn bg-danger btn-outline-secondary"  id="search" type="button">Button</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="container data-range"></div>
+
+    </body>
+</html>
+
+
+
+<script>    
+    var input_data = $("#data");
+    var search_btn = $("#search");
+    var selected = $("#select");
+    var select = "Email";
+
+
+
+    add_html_mail = (obj) => {
+        var data =  JSON.parse(obj);
+        data["data"].forEach(element => {
+            $(".data-range").append(
+                "<div class='alert alert-success' role='alert'>" + JSON.parse(element)["Mail"] +"</div>"
+            );
+        });
+    }
+
+    add_html_name = (obj) => {
+        var data =  JSON.parse(obj);
+        data["data"].forEach(element => {
+            $(".data-range").append(
+                "<div class='alert alert-success' role='alert'>" + JSON.parse(element)["Name"] +"</div>"
+            );
+        });
+    }
+
+
+    add_html_tel = (obj) => {
+        var data =  JSON.parse(obj);
+
+        $(".data-range").append(
+            "<div class='alert alert-success' role='alert'> Telefon: " + data["Tel"]  +" &nbsp;&nbsp;Cari Kod: " +data["Kod"]  +"</div>"
+        );
+
+    }
+
+
+
+    rest_api = (url)=> {
+        return $.ajax({
+            type: "GET",
+            url: url,
+            contentType:"text/plain",
+            async: false,
+            headers: {
+                'Access-Control-Allow-Origin':'*',
+                'Access-Control-Allow-Methods':'GET'
+            },
+            success: function(data) {},
+            error: function(error) {
+                console.log(error);
+            }
+        }).responseText;
+    }
+
+    
+    selected.change(()=> {
+        select = selected.val();
+    });
+
+
+    var data = "";
+    search_btn.on("click",(e)=>{
+        $(".data-range").empty();
+        var url = "";
+        switch(select){
+            case "Email":
+                url = "http://127.0.0.1:1999/query?mail="+input_data.val();
+                data = rest_api(url);
+                add_html_mail(data);
+                break;
+            case "Firma İsmi":
+                url = "http://127.0.0.1:1999/query?name="+input_data.val();
+                data = rest_api(url);
+                add_html_name(data);
+                break;
+            case "Telefon":
+                url = "http://127.0.0.1:1999/query?tel="+input_data.val();
+                data = rest_api(url);
+                add_html_tel(data);
+                break;
+        }
+        input_data.val("");
+    });
+
+
+
+    
+</script>
